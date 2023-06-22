@@ -4,6 +4,8 @@ use std::fs;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    #[arg(short, long)]
+    trace: bool,
     file: String,
 }
 
@@ -116,11 +118,15 @@ fn parse(code : &String) -> Vec<Instruction> {
     output
 }
 
-fn interpret(code : &Vec<Instruction>) {
+fn interpret(code : &Vec<Instruction>, trace: bool) {
     let mut pc : usize = 0;
     let mut mp : u16 = 0;
     let mut memory : Vec<u8> = vec![0; u16::max_value() as usize + 1];
     while pc < code.len() {
+        if trace {
+            println!("Executing instruction {:?}", code[pc]);
+            println!("pc: {}, mp: {}", pc, mp);
+        }
         match code[pc] {
             Instruction::PointerIncrement(i) => {
                 mp = mp.wrapping_add(i as u16);
@@ -171,5 +177,5 @@ fn main() {
     let args = Args::parse();
     let code = fs::read_to_string(args.file).expect("Could not read file");
     let code = parse(&code);
-    interpret(&code);
+    interpret(&code, args.trace);
 }
