@@ -30,3 +30,15 @@ fn test_move_increment() {
     asm.run(memory2.as_mut_slice());
     assert_vecs_equal(&memory1, &memory2);
 }
+
+#[test]
+fn test_decrement() {
+    let code = parse(&"--".to_string());
+    let mut memory1 = vec![0; u16::max_value() as usize + 1];
+    let mut memory2 = vec![0; u16::max_value() as usize + 1];
+    interpret(&code, memory1.as_mut_slice(), false);
+    let asm = compile(&code);
+    asm.run(memory2.as_mut_slice());
+    assert_vecs_equal(&memory1, &memory2);
+}
+

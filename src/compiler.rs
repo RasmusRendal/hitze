@@ -87,7 +87,6 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 panic!("Unsupported instruction");
             }
             Instruction::Plus(i) => {
-                // ADD reg/mem8, imm8
                 // 80 /0 ib
                 push_byte(&mut pc, 0x80);
                 // ModRM
@@ -96,11 +95,15 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 push_byte(&mut pc, i as u8);
             }
             Instruction::Minus(i) => {
-                panic!("Unsupported instruction");
+                // 80 /0 ib
+                push_byte(&mut pc, 0x80);
+                // ModRM
+                push_byte(&mut pc, 0b00_101_000);
+                // Add with
+                push_byte(&mut pc, i as u8);
             }
             Instruction::Output(i) => {
-                break;
-                //panic!("Unsupported instruction");
+                panic!("Unsupported instruction");
             }
             Instruction::Input(i) => {
                 panic!("Unsupported instruction");
