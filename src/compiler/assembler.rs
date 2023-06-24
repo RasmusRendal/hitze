@@ -3,13 +3,13 @@ use std::mem;
 const PAGE_SIZE: usize = 4096;
 
 pub struct Program {
-    pub func: fn(bf_memory: *mut u8) -> i64,
+    pub func: fn(bf_memory: *mut u8, len: usize) -> i64,
 }
 
 impl Program {
     pub fn run(&self, memory: &mut [u8]) -> i64 {
         let func = self.func;
-        func(memory.as_mut_ptr())
+        func(memory.as_mut_ptr(), memory.len())
     }
 }
 
@@ -111,6 +111,12 @@ impl Assembler {
         self.push_byte(imm8);
     }
 
+    pub fn add_reg_reg(&mut self, dst: u8, src: u8) {
+        self.push_byte(REXW);
+        self.push_byte(0x01);
+        self.push_byte(0b11_000_000 + dst + (src << 3));
+    }
+
     pub fn sub_regmem8_imm8(&mut self, reg: u8, imm8: u8) {
         self.push_byte(0x80);
         self.push_byte(0b00_101_000 + reg);
@@ -157,6 +163,12 @@ impl Assembler {
         self.push_byte(imm8);
     }
 
+    pub fn cmp_reg_reg(&mut self, reg1: u8, reg2: u8) {
+        self.push_byte(REXW);
+        self.push_byte(0x39);
+        self.push_byte(0b11_000_000 + reg1 + (reg2 << 3));
+    }
+
     // Returns a pointer to the address, so we can update it later
     pub fn jz(&mut self, rel8off: i8) -> isize {
         self.push_byte(0x74);
@@ -166,6 +178,11 @@ impl Assembler {
 
     pub fn jne(&mut self, rel8off: i8) {
         self.push_byte(0x75);
+        self.push_byte(rel8off as u8);
+    }
+
+    pub fn jna(&mut self, rel8off: i8) {
+        self.push_byte(0x76);
         self.push_byte(rel8off as u8);
     }
 

@@ -2,9 +2,10 @@ use super::parser::Instruction;
 extern crate libc;
 mod assembler;
 use assembler::*;
-use std::mem;
 
 /* General notes
+ * Arguments: %rdi memory region start
+ * %rsi memory region len
  * We store the pointer in %rax
  */
 
@@ -26,6 +27,9 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
             }
             Instruction::PointerDecrement(i) => {
                 assembler.sub_rax_imm32(i as u32);
+                assembler.cmp_reg_reg(RDI, RAX);
+                assembler.jna(3);
+                assembler.add_reg_reg(RAX, RSI);
             }
             Instruction::Plus(i) => {
                 assembler.add_regmem8_imm8(RAX, i);
