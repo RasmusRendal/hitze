@@ -2,6 +2,7 @@ use super::parser::Instruction;
 extern crate libc;
 mod assembler;
 use assembler::*;
+use std::mem;
 
 /* General notes
  * We store the pointer in %rax
@@ -33,16 +34,24 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 assembler.sub_regmem8_imm8(RAX, i);
             }
             Instruction::Output(i) => {
+                assembler.push(RAX);
+                assembler.mov_reg_reg(RSI, RAX);
+                assembler.mov_reg_imm64(RAX, 1);
+                assembler.mov_reg_imm64(RDI, 1);
+                assembler.mov_reg_imm64(RDX, 1);
+                for _ in 0..i {
+                    assembler.syscall();
+                }
+                assembler.pop(RAX);
+            }
+            Instruction::Input(_) => {
                 panic!("Unsupported instruction");
             }
-            Instruction::Input(i) => {
-                panic!("Unsupported instruction");
-            }
-            Instruction::LoopBegin(i) => {
+            Instruction::LoopBegin(_) => {
                 assembler.cmp_mem8_imm8(RAX, 0);
                 leftloops.push(assembler.jz(0));
             }
-            Instruction::LoopEnd(i) => {
+            Instruction::LoopEnd(_) => {
                 assembler.cmp_mem8_imm8(RAX, 0);
                 let leftpos = leftloops.pop().unwrap();
                 let relpos = leftpos - assembler.cur_index - 1;

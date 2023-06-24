@@ -65,6 +65,13 @@ impl Assembler {
         }
     }
 
+    fn push_qword(&mut self, qword: u64) {
+        let bytes = qword.to_le_bytes();
+        for i in 0..bytes.len() {
+            self.push_byte(bytes[i]);
+        }
+    }
+
     pub fn update_byte(&mut self, index: isize, byte: u8) {
         unsafe {
             *(self.page.offset(index) as *mut u8) = byte;
@@ -119,6 +126,12 @@ impl Assembler {
         self.push_byte(0b11_000_000 + dst + (src << 3));
     }
 
+    pub fn mov_reg_imm64(&mut self, dst: u8, imm64: u64) {
+        self.push_byte(REXW);
+        self.push_byte(0xB8 + dst);
+        self.push_qword(imm64);
+    }
+
     pub fn cmp_mem8_imm8(&mut self, memreg: u8, imm8: u8) {
         self.push_byte(0x80);
         self.push_byte(0b00_111_000 + memreg);
@@ -135,5 +148,10 @@ impl Assembler {
     pub fn jne(&mut self, rel8off: i8) {
         self.push_byte(0x75);
         self.push_byte(rel8off as u8);
+    }
+
+    pub fn syscall(&mut self) {
+        self.push_byte(0x0F);
+        self.push_byte(0x05);
     }
 }
