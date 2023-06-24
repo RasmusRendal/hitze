@@ -42,3 +42,4 @@ fn test_decrement() {
     assert_vecs_equal(&memory1, &memory2);
 }
 
+
