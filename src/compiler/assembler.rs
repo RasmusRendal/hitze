@@ -72,6 +72,13 @@ impl Assembler {
         }
     }
 
+    fn push_dword(&mut self, dword: u32) {
+        let bytes = dword.to_le_bytes();
+        for i in 0..bytes.len() {
+            self.push_byte(bytes[i]);
+        }
+    }
+
     pub fn update_byte(&mut self, index: isize, byte: u8) {
         unsafe {
             *(self.page.offset(index) as *mut u8) = byte;
@@ -115,9 +122,21 @@ impl Assembler {
         self.push_byte(imm8);
     }
 
+    pub fn add_rax_imm32(&mut self, imm32: u32) {
+        self.push_byte(REXW);
+        self.push_byte(0x05);
+        self.push_dword(imm32);
+    }
+
     pub fn sub_al_imm8(&mut self, imm8: u8) {
         self.push_byte(0x2C);
         self.push_byte(imm8);
+    }
+
+    pub fn sub_rax_imm32(&mut self, imm32: u32) {
+        self.push_byte(REXW);
+        self.push_byte(0x2D);
+        self.push_dword(imm32);
     }
 
     pub fn mov_reg_reg(&mut self, dst: u8, src: u8) {

@@ -22,10 +22,10 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
     for instr in code {
         match *instr {
             Instruction::PointerIncrement(i) => {
-                assembler.add_al_imm8(i as u8);
+                assembler.add_rax_imm32(i as u32);
             }
             Instruction::PointerDecrement(i) => {
-                assembler.sub_al_imm8(i as u8);
+                assembler.sub_rax_imm32(i as u32);
             }
             Instruction::Plus(i) => {
                 assembler.add_regmem8_imm8(RAX, i);
@@ -36,10 +36,10 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
             Instruction::Output(i) => {
                 assembler.push(RAX);
                 assembler.mov_reg_reg(RSI, RAX);
-                assembler.mov_reg_imm64(RAX, 1);
                 assembler.mov_reg_imm64(RDI, 1);
                 assembler.mov_reg_imm64(RDX, 1);
                 for _ in 0..i {
+                    assembler.mov_reg_imm64(RAX, 1);
                     assembler.syscall();
                 }
                 assembler.pop(RAX);
