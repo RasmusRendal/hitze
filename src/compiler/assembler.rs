@@ -102,6 +102,11 @@ impl Assembler {
         self.push_byte(imm8);
     }
 
+    pub fn sub_al_imm8(&mut self, imm8: u8) {
+        self.push_byte(0x2C);
+        self.push_byte(imm8);
+    }
+
     pub fn mov_reg_reg(&mut self, dst: u8, src: u8) {
         self.push_byte(REXW);
         self.push_byte(0x89);

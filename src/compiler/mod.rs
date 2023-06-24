@@ -22,7 +22,7 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 assembler.add_al_imm8(i as u8);
             }
             Instruction::PointerDecrement(i) => {
-                panic!("Unsupported instruction");
+                assembler.sub_al_imm8(i as u8);
             }
             Instruction::Plus(i) => {
                 assembler.add_regmem8_imm8(RAX, i);
