@@ -16,6 +16,8 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
     assembler.push(RDI);
     assembler.pop(RAX);
 
+    let mut leftloops: Vec<isize> = vec![];
+
     for instr in code {
         match *instr {
             Instruction::PointerIncrement(i) => {
@@ -37,10 +39,15 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 panic!("Unsupported instruction");
             }
             Instruction::LoopBegin(i) => {
-                panic!("Unsupported instruction");
+                assembler.cmp_mem8_imm8(RAX, 0);
+                leftloops.push(assembler.jz(0));
             }
             Instruction::LoopEnd(i) => {
-                panic!("Unsupported instruction");
+                assembler.cmp_mem8_imm8(RAX, 0);
+                let leftpos = leftloops.pop().unwrap();
+                let relpos = leftpos - assembler.cur_index - 1;
+                assembler.jne(relpos as i8);
+                assembler.update_byte(leftpos, (assembler.cur_index - leftpos - 1) as u8);
             }
         }
     }

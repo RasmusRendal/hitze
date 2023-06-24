@@ -20,9 +20,10 @@ fn assert_memory_equal(code: &String) {
 }
 
 #[test]
-fn test_increment() {
+fn test_code() {
     assert_memory_equal(&"+++".to_string());
     assert_memory_equal(&"+++>+++".to_string());
     assert_memory_equal(&"--".to_string());
     assert_memory_equal(&"+>+<+".to_string());
+    assert_memory_equal(&"+++[>+<-]".to_string());
 }

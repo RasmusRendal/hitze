@@ -23,7 +23,7 @@ impl Drop for Program {
 
 pub struct Assembler {
     page: *mut libc::c_void,
-    cur_index: isize,
+    pub cur_index: isize,
 }
 
 pub unsafe fn allocate() -> Assembler {
@@ -62,6 +62,12 @@ impl Assembler {
         unsafe {
             *(self.page.offset(self.cur_index) as *mut u8) = byte;
             self.cur_index += 1;
+        }
+    }
+
+    pub fn update_byte(&mut self, index: isize, byte: u8) {
+        unsafe {
+            *(self.page.offset(index) as *mut u8) = byte;
         }
     }
 
@@ -111,5 +117,23 @@ impl Assembler {
         self.push_byte(REXW);
         self.push_byte(0x89);
         self.push_byte(0b11_000_000 + dst + (src << 3));
+    }
+
+    pub fn cmp_mem8_imm8(&mut self, memreg: u8, imm8: u8) {
+        self.push_byte(0x80);
+        self.push_byte(0b00_111_000 + memreg);
+        self.push_byte(imm8);
+    }
+
+    // Returns a pointer to the address, so we can update it later
+    pub fn jz(&mut self, rel8off: i8) -> isize {
+        self.push_byte(0x74);
+        self.push_byte(rel8off as u8);
+        self.cur_index - 1
+    }
+
+    pub fn jne(&mut self, rel8off: i8) {
+        self.push_byte(0x75);
+        self.push_byte(rel8off as u8);
     }
 }
