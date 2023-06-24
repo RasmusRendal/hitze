@@ -52,3 +52,20 @@ pub fn interpret(code: &Vec<Instruction>, memory: &mut [u8], trace: bool) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_underflow() {
+        let mut code = vec![];
+        code.push(Instruction::PointerDecrement(1));
+        code.push(Instruction::PointerIncrement(1));
+        code.push(Instruction::Minus(1));
+        code.push(Instruction::Plus(1));
+        let mut memory = [0u8; 4];
+        interpret(&code, &mut memory, false);
+        assert_eq!(memory[0], 0);
+    }
+}

@@ -4,9 +4,15 @@ use hitze::compiler::compile;
 
 fn assert_vecs_equal(vec1: &Vec<u8>, vec2 : &Vec<u8>) {
     assert_eq!(vec1.len(), vec2.len());
+    let mut correct = true;
     for i in 0..vec1.len() {
-        assert_eq!(vec1[i], vec2[i]);
+        if vec1[i] != vec2[i] {
+            println!("intmem[{}] = {}", i, vec1[i]);
+            println!("jitmem[{}] = {}", i, vec2[i]);
+            correct = false;
+        }
     }
+    assert!(correct);
 }
 
 fn assert_memory_equal(code: &String) {
@@ -27,4 +33,7 @@ fn test_code() {
     assert_memory_equal(&"+>+<+".to_string());
     assert_memory_equal(&"+++[>+<-]".to_string());
     assert_memory_equal(&"<+".to_string());
+    assert_memory_equal(&"<>+".to_string());
+
+
 }

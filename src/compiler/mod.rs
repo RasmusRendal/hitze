@@ -18,12 +18,18 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
     assembler.push(RDI);
     assembler.pop(RAX);
 
+    assembler.mov_reg_reg(RDX, RAX);
+    assembler.add_reg_reg(RDX, RSI);
+
     let mut leftloops: Vec<isize> = vec![];
 
     for instr in code {
         match *instr {
             Instruction::PointerIncrement(i) => {
                 assembler.add_rax_imm32(i as u32);
+                assembler.cmp_reg_reg(RDX, RAX);
+                assembler.jnbe(3);
+                assembler.sub_reg_reg(RAX, RSI);
             }
             Instruction::PointerDecrement(i) => {
                 assembler.sub_rax_imm32(i as u32);

@@ -117,10 +117,23 @@ impl Assembler {
         self.push_byte(0b11_000_000 + dst + (src << 3));
     }
 
+    pub fn sub_reg_reg(&mut self, dst: u8, src: u8) {
+        self.push_byte(REXW);
+        self.push_byte(0x29);
+        self.push_byte(0b11_000_000 + dst + (src << 3));
+    }
+
     pub fn sub_regmem8_imm8(&mut self, reg: u8, imm8: u8) {
         self.push_byte(0x80);
         self.push_byte(0b00_101_000 + reg);
         self.push_byte(imm8);
+    }
+
+    pub fn sub_reg_imm32(&mut self, reg: u8, imm: u32) {
+        self.push_byte(REXW);
+        self.push_byte(0x81);
+        self.push_byte(0b11_010_000 + reg);
+        self.push_dword(imm);
     }
 
     pub fn add_al_imm8(&mut self, imm8: u8) {
@@ -183,6 +196,11 @@ impl Assembler {
 
     pub fn jna(&mut self, rel8off: i8) {
         self.push_byte(0x76);
+        self.push_byte(rel8off as u8);
+    }
+
+    pub fn jnbe(&mut self, rel8off: i8) {
+        self.push_byte(0x77);
         self.push_byte(rel8off as u8);
     }
 
