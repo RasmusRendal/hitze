@@ -45,6 +45,9 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
             }
             Instruction::Output(i) => {
                 assembler.push(RAX);
+                assembler.push(RDI);
+                assembler.push(RSI);
+                assembler.push(RDX);
                 assembler.mov_reg_reg(RSI, RAX);
                 assembler.mov_reg_imm64(RDI, 1);
                 assembler.mov_reg_imm64(RDX, 1);
@@ -52,6 +55,9 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                     assembler.mov_reg_imm64(RAX, 1);
                     assembler.syscall();
                 }
+                assembler.pop(RDX);
+                assembler.pop(RSI);
+                assembler.pop(RDI);
                 assembler.pop(RAX);
             }
             Instruction::Input(_) => {
