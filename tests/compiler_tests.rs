@@ -34,4 +34,5 @@ fn test_code() {
     assert_memory_equal(&"+++[>+<-]".to_string());
     assert_memory_equal(&"<+".to_string());
     assert_memory_equal(&"<>+".to_string());
+    assert_memory_equal(&"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>>---++++++++++>><-<+++-------------->>+>++".to_string());
 }
