@@ -34,5 +34,9 @@ fn test_code() {
     assert_memory_equal(&"+++[>+<-]".to_string());
     assert_memory_equal(&"<+".to_string());
     assert_memory_equal(&"<>+".to_string());
+    // Hello World
     assert_memory_equal(&"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>>---++++++++++>><-<+++-------------->>+>++".to_string());
+    // Hello World (Golfed)
+    assert_memory_equal(&"+[-->-[>>+>-----<<]<--<---]>->>>+>>+++[>]<<<<+++------<<->>>>+".to_string());
+
 }
