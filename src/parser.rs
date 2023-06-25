@@ -21,7 +21,7 @@ fn append_current(output: &mut Vec<Instruction>, current: Option<Instruction>) {
     }
 }
 
-pub fn parse(code: &String) -> Vec<Instruction> {
+pub fn parse(code: &str) -> Vec<Instruction> {
     let mut output: Vec<Instruction> = vec![];
     let mut i: Option<Instruction> = None;
     let mut loop_begins: Vec<usize> = vec![];
@@ -93,11 +93,8 @@ pub fn parse(code: &String) -> Vec<Instruction> {
     }
     append_current(&mut output, i);
     for instr in output.iter() {
-        match instr {
-            Instruction::LoopBegin(i) => {
-                assert!(*i != 0);
-            }
-            _ => {}
+        if let Instruction::LoopBegin(i) = instr {
+            assert!(*i != 0);
         }
     }
     output

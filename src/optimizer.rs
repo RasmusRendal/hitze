@@ -11,7 +11,7 @@ pub fn optimize(code: &mut Vec<Instruction>) {
                         code.remove(i - 2);
                         code.remove(i - 2);
                         code.insert(i - 2, Instruction::ResetByte);
-                        i = i - 1;
+                        i -= 1;
                     }
                 }
             }

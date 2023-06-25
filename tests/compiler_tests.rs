@@ -1,8 +1,8 @@
-use hitze::parser::parse;
-use hitze::interpreter::interpret;
 use hitze::compiler::compile;
+use hitze::interpreter::interpret;
+use hitze::parser::parse;
 
-fn assert_vecs_equal(vec1: &Vec<u8>, vec2 : &Vec<u8>) {
+fn assert_vecs_equal(vec1: &Vec<u8>, vec2: &Vec<u8>) {
     assert_eq!(vec1.len(), vec2.len());
     let mut correct = true;
     for i in 0..vec1.len() {
@@ -15,7 +15,7 @@ fn assert_vecs_equal(vec1: &Vec<u8>, vec2 : &Vec<u8>) {
     assert!(correct);
 }
 
-fn assert_memory_equal(code: &String) {
+fn assert_memory_equal(code: &str) {
     let code = parse(code);
     let mut memory1 = vec![0; u16::max_value() as usize + 1];
     let mut memory2 = vec![0; u16::max_value() as usize + 1];
@@ -27,16 +27,15 @@ fn assert_memory_equal(code: &String) {
 
 #[test]
 fn test_code() {
-    assert_memory_equal(&"+++".to_string());
-    assert_memory_equal(&"+++>+++".to_string());
-    assert_memory_equal(&"--".to_string());
-    assert_memory_equal(&"+>+<+".to_string());
-    assert_memory_equal(&"+++[>+<-]".to_string());
-    assert_memory_equal(&"<+".to_string());
-    assert_memory_equal(&"<>+".to_string());
+    assert_memory_equal("+++");
+    assert_memory_equal("+++>+++");
+    assert_memory_equal("--");
+    assert_memory_equal("+>+<+");
+    assert_memory_equal("+++[>+<-]");
+    assert_memory_equal("<+");
+    assert_memory_equal("<>+");
     // Hello World
-    assert_memory_equal(&"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>>---++++++++++>><-<+++-------------->>+>++".to_string());
+    assert_memory_equal("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>>---++++++++++>><-<+++-------------->>+>++");
     // Hello World (Golfed)
-    assert_memory_equal(&"+[-->-[>>+>-----<<]<--<---]>->>>+>>+++[>]<<<<+++------<<->>>>+".to_string());
-
+    assert_memory_equal("+[-->-[>>+>-----<<]<--<---]>->>>+>>+++[>]<<<<+++------<<->>>>+");
 }

@@ -64,15 +64,15 @@ impl Assembler {
 
     fn push_qword(&mut self, qword: u64) {
         let bytes = qword.to_ne_bytes();
-        for i in 0..bytes.len() {
-            self.push_byte(bytes[i]);
+        for byte in bytes {
+            self.push_byte(byte);
         }
     }
 
     fn push_dword(&mut self, dword: u32) {
         let bytes = dword.to_ne_bytes();
-        for i in 0..bytes.len() {
-            self.push_byte(bytes[i]);
+        for byte in bytes {
+            self.push_byte(byte);
         }
     }
 
