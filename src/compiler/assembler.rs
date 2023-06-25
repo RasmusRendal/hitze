@@ -26,17 +26,22 @@ pub struct Assembler {
     pub cur_index: isize,
 }
 
-pub unsafe fn allocate(len: usize) -> Assembler {
+pub fn allocate(len: usize) -> Assembler {
     let len = ((len / PAGE_SIZE) + 1) * PAGE_SIZE;
-    let contents = mem::MaybeUninit::<*mut u8>::uninit();
-    libc::posix_memalign(contents.as_ptr() as *mut *mut libc::c_void, PAGE_SIZE, len);
-    let contents = *contents.as_ptr() as *mut libc::c_void;
-    libc::mprotect(
-        contents,
-        len,
-        libc::PROT_EXEC | libc::PROT_READ | libc::PROT_WRITE,
-    );
-    libc::memset(contents, 0, len);
+
+    let contents = unsafe {
+        let contents = mem::MaybeUninit::<*mut u8>::uninit();
+        libc::posix_memalign(contents.as_ptr() as *mut *mut libc::c_void, PAGE_SIZE, len);
+        *contents.as_ptr() as *mut libc::c_void
+    };
+    unsafe {
+        libc::mprotect(
+            contents,
+            len,
+            libc::PROT_EXEC | libc::PROT_READ | libc::PROT_WRITE,
+        );
+        libc::memset(contents, 0, len);
+    }
     Assembler {
         page: contents,
         cur_index: 0,
@@ -55,6 +60,8 @@ pub const RDI: u8 = 0b111;
 const REXW: u8 = 0x48;
 
 impl Assembler {
+    // TODO: I might be a bit of a bad rustacean here, but these functions are not
+    // actually safe, having no bounds check
     fn push_byte(&mut self, byte: u8) {
         unsafe {
             *(self.page.offset(self.cur_index) as *mut u8) = byte;

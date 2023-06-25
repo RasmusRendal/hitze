@@ -9,6 +9,7 @@ pub enum Instruction {
     LoopEnd(usize),
 }
 
+#[inline(always)]
 fn append_current(output: &mut Vec<Instruction>, current: Option<Instruction>) {
     if let Some(i) = current {
         match i {
