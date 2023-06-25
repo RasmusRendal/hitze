@@ -64,9 +64,14 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
             Instruction::LoopEnd(_) => {
                 assembler.cmp_mem8_imm8(RAX, 0);
                 let leftpos = leftloops.pop().unwrap();
-                let relpos = leftpos - assembler.cur_index - 1;
-                assembler.jne(relpos as i8);
-                assembler.update_byte(leftpos, (assembler.cur_index - leftpos - 1) as u8);
+                let relpos = leftpos - assembler.cur_index;
+                assembler.jne((relpos - 2) as i32);
+                let frontpos = (assembler.cur_index - leftpos - 4) as i32;
+                let frontposbytes = frontpos.to_le_bytes();
+                assembler.update_byte(leftpos, frontposbytes[0]);
+                assembler.update_byte(leftpos + 1, frontposbytes[1]);
+                assembler.update_byte(leftpos + 2, frontposbytes[2]);
+                assembler.update_byte(leftpos + 3, frontposbytes[3]);
             }
         }
     }

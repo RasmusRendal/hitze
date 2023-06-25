@@ -66,14 +66,14 @@ impl Assembler {
     }
 
     fn push_qword(&mut self, qword: u64) {
-        let bytes = qword.to_le_bytes();
+        let bytes = qword.to_ne_bytes();
         for i in 0..bytes.len() {
             self.push_byte(bytes[i]);
         }
     }
 
     fn push_dword(&mut self, dword: u32) {
-        let bytes = dword.to_le_bytes();
+        let bytes = dword.to_ne_bytes();
         for i in 0..bytes.len() {
             self.push_byte(bytes[i]);
         }
@@ -183,15 +183,17 @@ impl Assembler {
     }
 
     // Returns a pointer to the address, so we can update it later
-    pub fn jz(&mut self, rel8off: i8) -> isize {
-        self.push_byte(0x74);
-        self.push_byte(rel8off as u8);
-        self.cur_index - 1
+    pub fn jz(&mut self, rel32off: i32) -> isize {
+        self.push_byte(0x0F);
+        self.push_byte(0x84);
+        self.push_dword(rel32off as u32);
+        self.cur_index - 4
     }
 
-    pub fn jne(&mut self, rel8off: i8) {
-        self.push_byte(0x75);
-        self.push_byte(rel8off as u8);
+    pub fn jne(&mut self, rel32off: i32) {
+        self.push_byte(0x0F);
+        self.push_byte(0x85);
+        self.push_dword(rel32off as u32);
     }
 
     pub fn jna(&mut self, rel8off: i8) {
