@@ -6,11 +6,12 @@ use assembler::*;
 /* General notes
  * Arguments: %rdi memory region start
  * %rsi memory region len
+ * %rdx memory region end
  * We store the pointer in %rax
  */
 
 pub fn compile(code: &Vec<Instruction>) -> Program {
-    let mut assembler = unsafe { allocate() };
+    let mut assembler = unsafe { allocate(code.len() * 10) };
 
     assembler.push(RBP);
     assembler.mov_reg_reg(RBP, RSP);
