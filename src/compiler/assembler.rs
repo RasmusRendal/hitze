@@ -167,6 +167,12 @@ impl Assembler {
         self.push_qword(imm64);
     }
 
+    pub fn mov_mem8_imm8(&mut self, dst: u8, imm8: u8) {
+        self.push_byte(0xc6);
+        self.push_byte(0b00_000_000 + dst);
+        self.push_byte(imm8);
+    }
+
     pub fn cmp_mem8_imm8(&mut self, memreg: u8, imm8: u8) {
         self.push_byte(0x80);
         self.push_byte(0b00_111_000 + memreg);

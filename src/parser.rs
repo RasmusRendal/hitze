@@ -2,6 +2,7 @@
 pub enum Instruction {
     MovePointer(isize),
     Add(i8),
+    ResetByte,
     Output(usize),
     Input(usize),
     LoopBegin(usize),

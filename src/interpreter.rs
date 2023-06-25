@@ -25,6 +25,10 @@ pub fn interpret(code: &Vec<Instruction>, memory: &mut [u8], trace: bool) {
                 }
                 pc += 1;
             }
+            Instruction::ResetByte => {
+                memory[mp as usize] = 0;
+                pc += 1;
+            }
             Instruction::Output(i) => {
                 for _ in 0..i {
                     let c: char = memory[mp as usize].into();

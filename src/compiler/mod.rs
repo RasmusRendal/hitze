@@ -46,6 +46,9 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                     assembler.add_regmem8_imm8(RAX, i as u8);
                 }
             }
+            Instruction::ResetByte => {
+                assembler.mov_mem8_imm8(RAX, 0);
+            }
             Instruction::Output(i) => {
                 assembler.push(RAX);
                 assembler.push(RDI);
