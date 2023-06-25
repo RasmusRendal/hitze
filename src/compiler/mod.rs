@@ -26,23 +26,25 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
 
     for instr in code {
         match *instr {
-            Instruction::PointerIncrement(i) => {
-                assembler.add_rax_imm32(i as u32);
-                assembler.cmp_reg_reg(RDX, RAX);
-                assembler.jnbe(3);
-                assembler.sub_reg_reg(RAX, RSI);
+            Instruction::MovePointer(i) => {
+                if i < 0 {
+                    assembler.sub_rax_imm32(isize::abs(i) as u32);
+                    assembler.cmp_reg_reg(RDI, RAX);
+                    assembler.jna(3);
+                    assembler.add_reg_reg(RAX, RSI);
+                } else {
+                    assembler.add_rax_imm32(i as u32);
+                    assembler.cmp_reg_reg(RDX, RAX);
+                    assembler.jnbe(3);
+                    assembler.sub_reg_reg(RAX, RSI);
+                }
             }
-            Instruction::PointerDecrement(i) => {
-                assembler.sub_rax_imm32(i as u32);
-                assembler.cmp_reg_reg(RDI, RAX);
-                assembler.jna(3);
-                assembler.add_reg_reg(RAX, RSI);
-            }
-            Instruction::Plus(i) => {
-                assembler.add_regmem8_imm8(RAX, i);
-            }
-            Instruction::Minus(i) => {
-                assembler.sub_regmem8_imm8(RAX, i);
+            Instruction::Add(i) => {
+                if i < 0 {
+                    assembler.sub_regmem8_imm8(RAX, i8::abs(i) as u8);
+                } else {
+                    assembler.add_regmem8_imm8(RAX, i as u8);
+                }
             }
             Instruction::Output(i) => {
                 assembler.push(RAX);

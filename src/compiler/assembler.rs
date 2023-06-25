@@ -27,6 +27,7 @@ pub struct Assembler {
 }
 
 pub unsafe fn allocate(len: usize) -> Assembler {
+    let len = ((len / PAGE_SIZE) + 1) * PAGE_SIZE;
     let contents = mem::MaybeUninit::<*mut u8>::uninit();
     libc::posix_memalign(contents.as_ptr() as *mut *mut libc::c_void, PAGE_SIZE, len);
     let contents = *contents.as_ptr() as *mut libc::c_void;
@@ -35,7 +36,7 @@ pub unsafe fn allocate(len: usize) -> Assembler {
         len,
         libc::PROT_EXEC | libc::PROT_READ | libc::PROT_WRITE,
     );
-    libc::memset(contents, 0, PAGE_SIZE);
+    libc::memset(contents, 0, len);
     Assembler {
         page: contents,
         cur_index: 0,

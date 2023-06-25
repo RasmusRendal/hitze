@@ -9,20 +9,20 @@ pub fn interpret(code: &Vec<Instruction>, memory: &mut [u8], trace: bool) {
             println!("pc: {}, mp: {}", pc, mp);
         }
         match code[pc] {
-            Instruction::PointerIncrement(i) => {
-                mp = mp.wrapping_add(i as u16);
+            Instruction::MovePointer(i) => {
+                if i < 0 {
+                    mp = mp.wrapping_sub(isize::abs(i) as u16);
+                } else {
+                    mp = mp.wrapping_add(i as u16);
+                }
                 pc += 1;
             }
-            Instruction::PointerDecrement(i) => {
-                mp = mp.wrapping_sub(i as u16);
-                pc += 1;
-            }
-            Instruction::Plus(i) => {
-                memory[mp as usize] = memory[mp as usize].wrapping_add(i);
-                pc += 1;
-            }
-            Instruction::Minus(i) => {
-                memory[mp as usize] = memory[mp as usize].wrapping_sub(i);
+            Instruction::Add(i) => {
+                if i < 0 {
+                    memory[mp as usize] = memory[mp as usize].wrapping_sub(i8::abs(i) as u8);
+                } else {
+                    memory[mp as usize] = memory[mp as usize].wrapping_add(i as u8);
+                }
                 pc += 1;
             }
             Instruction::Output(i) => {
@@ -60,10 +60,10 @@ mod tests {
     #[test]
     fn test_underflow() {
         let mut code = vec![];
-        code.push(Instruction::PointerDecrement(1));
-        code.push(Instruction::PointerIncrement(1));
-        code.push(Instruction::Minus(1));
-        code.push(Instruction::Plus(1));
+        code.push(Instruction::MovePointer(-1));
+        code.push(Instruction::MovePointer(1));
+        code.push(Instruction::Add(1));
+        code.push(Instruction::Add(-1));
         let mut memory = [0u8; 4];
         interpret(&code, &mut memory, false);
         assert_eq!(memory[0], 0);
