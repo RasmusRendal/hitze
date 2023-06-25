@@ -17,7 +17,7 @@
       defaultPackage = pkgs.stdenv.mkDerivation {
         pname = "hitze";
         version = "0.1";
-        buildInputs = with pkgs; [cargo rustc git rustfmt clippy];
+        buildInputs = with pkgs; [cargo rustc git rustfmt clippy gnuplot];
       };
       formatter = pkgs.alejandra;
     });

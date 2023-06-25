@@ -7,4 +7,9 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.3.5", features = ["derive"] }
+criterion = { version = "0.5.1", features = ["html_reports"] }
 libc = "0.2.146"
+
+[[bench]]
+name = "benchmark"
+harness = false
