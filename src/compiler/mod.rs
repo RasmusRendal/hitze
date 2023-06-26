@@ -14,11 +14,9 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
     let mut assembler = allocate(code.len() * 10);
 
     assembler.push(RBP);
+
     assembler.mov_reg_reg(RBP, RSP);
-
-    assembler.push(RDI);
-    assembler.pop(RAX);
-
+    assembler.mov_reg_reg(RAX, RDI);
     assembler.mov_reg_reg(RDX, RAX);
     assembler.add_reg_reg(RDX, RSI);
 
