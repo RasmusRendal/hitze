@@ -85,6 +85,16 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 assembler.update_byte(leftpos + 2, frontposbytes[2]);
                 assembler.update_byte(leftpos + 3, frontposbytes[3]);
             }
+            Instruction::AddRel(offset, mul) => {
+                assembler.mov_reg_mem8(RCX, RAX);
+                if mul != 1 {
+                    // TODO: Use an actual mul instruction, this is stupid
+                    for _ in 2..mul {
+                        assembler.add_reg_reg(RCX, RCX);
+                    }
+                }
+                assembler.add_rax8disp_reg(offset as i8, RCX);
+            }
             Instruction::Nop => {}
         }
     }

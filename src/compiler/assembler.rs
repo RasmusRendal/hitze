@@ -59,6 +59,17 @@ pub const RDI: u8 = 0b111;
 
 const REXW: u8 = 0x48;
 
+fn i8_to_i4(x: i8) -> u8 {
+    if x > 7 || x < -8 {
+        panic!("{} does not fit in i4", x);
+    }
+    if x >= 0 {
+        x as u8
+    } else {
+        0b1000 + (8 + x) as u8
+    }
+}
+
 impl Assembler {
     // TODO: I might be a bit of a bad rustacean here, but these functions are not
     // actually safe, having no bounds check
@@ -113,6 +124,12 @@ impl Assembler {
         self.push_byte(0x80);
         self.push_byte(0b00_000_000 + (reg << 3));
         self.push_byte(imm8);
+    }
+
+    pub fn add_rax8disp_reg(&mut self, disp: i8, src: u8) {
+        self.push_byte(0x00);
+        self.push_byte(0b01_000_000 + (src << 3));
+        self.push_byte(disp as u8);
     }
 
     pub fn add_reg_reg(&mut self, dst: u8, src: u8) {
@@ -174,6 +191,11 @@ impl Assembler {
         self.push_qword(imm64);
     }
 
+    pub fn mov_reg_mem8(&mut self, dst: u8, src: u8) {
+        self.push_byte(0x8A);
+        self.push_byte(0b00_000_000 + src + (dst << 3));
+    }
+
     pub fn mov_mem8_imm8(&mut self, dst: u8, imm8: u8) {
         self.push_byte(0xc6);
         self.push_byte(0b00_000_000 + dst);
@@ -219,5 +241,16 @@ impl Assembler {
     pub fn syscall(&mut self) {
         self.push_byte(0x0F);
         self.push_byte(0x05);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_i8_to_i4() {
+        assert_eq!(i8_to_i4(-1), 0b1111);
+        assert_eq!(i8_to_i4(-3), 0b1101);
     }
 }

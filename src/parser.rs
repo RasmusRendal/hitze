@@ -1,13 +1,20 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum Instruction {
+    // When positive, represents >, when negative represents <
     MovePointer(isize),
+    // When positive represents +, when negative represents -
     Add(i8),
-    ResetByte,
     Output(usize),
     Input(usize),
     LoopBegin(usize),
     LoopEnd(usize),
+    // Not real brainfuck
+    // Sets the current byte to zero
+    ResetByte,
+    // Empty instruction
     Nop,
+    // Adds the current byte to the byte n spaces removed, multiplied by the second argument
+    AddRel(isize, u8),
 }
 
 #[inline(always)]

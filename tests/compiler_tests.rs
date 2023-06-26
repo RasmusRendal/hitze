@@ -1,6 +1,6 @@
 use hitze::compiler::compile;
-use hitze::optimizer::optimize;
 use hitze::interpreter::interpret;
+use hitze::optimizer::optimize;
 use hitze::parser::parse;
 
 fn assert_vecs_equal(vec1: &Vec<u8>, vec2: &Vec<u8>) {
@@ -40,5 +40,6 @@ fn test_code() {
     assert_memory_equal("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>>---++++++++++>><-<+++-------------->>+>++");
     // Hello World (Golfed)
     assert_memory_equal("+[-->-[>>+>-----<<]<--<---]>->>>+>>+++[>]<<<<+++------<<->>>>+");
-    assert_memory_equal("++>+++++[-<+>]++++++++[<++++++>-]<.");
+    assert_memory_equal("++>+++++<[->+<]");
+    assert_memory_equal(include_str!("../examples/long.bf"));
 }
