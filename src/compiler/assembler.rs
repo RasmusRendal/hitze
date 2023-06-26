@@ -80,18 +80,18 @@ impl Assembler {
         }
     }
 
-    fn push_qword(&mut self, qword: u64) {
-        let bytes = qword.to_ne_bytes();
+    pub fn push_bytes(&mut self, bytes: &[u8]) {
         for byte in bytes {
-            self.push_byte(byte);
+            self.push_byte(*byte);
         }
     }
 
+    fn push_qword(&mut self, qword: u64) {
+        self.push_bytes(&qword.to_ne_bytes());
+    }
+
     fn push_dword(&mut self, dword: u32) {
-        let bytes = dword.to_ne_bytes();
-        for byte in bytes {
-            self.push_byte(byte);
-        }
+        self.push_bytes(&dword.to_ne_bytes());
     }
 
     pub fn update_byte(&mut self, index: isize, byte: u8) {
@@ -166,6 +166,12 @@ impl Assembler {
         self.push_byte(REXW);
         self.push_byte(0x05);
         self.push_dword(imm32);
+    }
+
+    pub fn imul_reg_imm32(&mut self, reg: u8, imm8: u8) {
+        self.push_byte(0x6B);
+        self.push_byte(0b11_000_000 + reg + (reg << 3));
+        self.push_byte(imm8);
     }
 
     pub fn sub_al_imm8(&mut self, imm8: u8) {

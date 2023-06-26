@@ -14,7 +14,7 @@ pub enum Instruction {
     // Empty instruction
     Nop,
     // Adds the current byte to the byte n spaces removed, multiplied by the second argument
-    AddRel(isize, u8),
+    AddRel(isize, i8),
 }
 
 fn append_current(output: &mut Vec<Instruction>, current: Option<Instruction>) {

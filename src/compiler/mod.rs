@@ -88,10 +88,7 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
             Instruction::AddRel(offset, mul) => {
                 assembler.mov_reg_mem8(RCX, RAX);
                 if mul != 1 {
-                    // TODO: Use an actual mul instruction, this is stupid
-                    for _ in 2..mul {
-                        assembler.add_reg_reg(RCX, RCX);
-                    }
+                    assembler.imul_reg_imm32(RCX, mul as u8);
                 }
                 assembler.add_rax8disp_reg(offset as i8, RCX);
             }
