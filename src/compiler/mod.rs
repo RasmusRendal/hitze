@@ -1,6 +1,6 @@
 use super::parser::Instruction;
 extern crate libc;
-mod assembler;
+pub mod assembler;
 use assembler::*;
 
 /* General notes
@@ -11,7 +11,7 @@ use assembler::*;
  */
 
 pub fn compile(code: &Vec<Instruction>) -> Program {
-    let mut assembler = unsafe { allocate(code.len() * 10) };
+    let mut assembler = allocate(code.len() * 10);
 
     assembler.push(RBP);
     assembler.mov_reg_reg(RBP, RSP);
