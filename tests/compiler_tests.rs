@@ -1,4 +1,5 @@
 use hitze::compiler::compile;
+use hitze::optimizer::optimize;
 use hitze::interpreter::interpret;
 use hitze::parser::parse;
 
@@ -16,10 +17,11 @@ fn assert_vecs_equal(vec1: &Vec<u8>, vec2: &Vec<u8>) {
 }
 
 fn assert_memory_equal(code: &str) {
-    let code = parse(code);
+    let mut code = parse(code);
     let mut memory1 = vec![0; u16::max_value() as usize + 1];
     let mut memory2 = vec![0; u16::max_value() as usize + 1];
     interpret(&code, memory1.as_mut_slice(), false);
+    optimize(&mut code);
     let asm = compile(&code);
     asm.run(memory2.as_mut_slice());
     assert_vecs_equal(&memory1, &memory2);
@@ -38,4 +40,5 @@ fn test_code() {
     assert_memory_equal("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>>---++++++++++>><-<+++-------------->>+>++");
     // Hello World (Golfed)
     assert_memory_equal("+[-->-[>>+>-----<<]<--<---]>->>>+>>+++[>]<<<<+++------<<->>>>+");
+    assert_memory_equal("++>+++++[-<+>]++++++++[<++++++>-]<.");
 }
