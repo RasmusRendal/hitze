@@ -53,6 +53,9 @@ pub fn interpret(code: &Vec<Instruction>, memory: &mut [u8], trace: bool) {
                     pc += 1;
                 }
             }
+            Instruction::Nop => {
+                pc += 1;
+            }
         }
     }
 }

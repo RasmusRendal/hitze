@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Instruction {
     MovePointer(isize),
     Add(i8),
@@ -7,6 +7,7 @@ pub enum Instruction {
     Input(usize),
     LoopBegin(usize),
     LoopEnd(usize),
+    Nop,
 }
 
 #[inline(always)]

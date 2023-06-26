@@ -85,6 +85,7 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 assembler.update_byte(leftpos + 2, frontposbytes[2]);
                 assembler.update_byte(leftpos + 3, frontposbytes[3]);
             }
+            Instruction::Nop => {}
         }
     }
     assembler.mov_reg_reg(RSP, RBP);
