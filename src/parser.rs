@@ -17,7 +17,6 @@ pub enum Instruction {
     AddRel(isize, u8),
 }
 
-#[inline(always)]
 fn append_current(output: &mut Vec<Instruction>, current: Option<Instruction>) {
     if let Some(i) = current {
         match i {
@@ -101,10 +100,5 @@ pub fn parse(code: &str) -> Vec<Instruction> {
         }
     }
     append_current(&mut output, i);
-    for instr in output.iter() {
-        if let Instruction::LoopBegin(i) = instr {
-            assert!(*i != 0);
-        }
-    }
     output
 }
