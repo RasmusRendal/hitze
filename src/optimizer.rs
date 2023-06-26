@@ -1,20 +1,17 @@
 use crate::parser::Instruction;
 
-pub fn optimize(code: &mut Vec<Instruction>) {
-    // You can take the man out of C++, but you can't take C++ out of the man
+pub fn optimize(code: &mut [Instruction]) {
     let mut i: usize = 2;
     while i < code.len() {
-        match unsafe { code.get_unchecked(i) } {
+        match code[i] {
             Instruction::LoopEnd(_) => {
-                if let Instruction::Add(_) = unsafe { code.get_unchecked(i - 1) } {
-                    if let Instruction::LoopBegin(_) = unsafe { code.get_unchecked(i - 2) } {
-                        unsafe {
-                            // Replace with NOP because removing elements from a vector is a O(n)
-                            // operation
-                            *code.get_unchecked_mut(i - 2) = Instruction::ResetByte;
-                            *code.get_unchecked_mut(i - 1) = Instruction::Nop;
-                            *code.get_unchecked_mut(i - 0) = Instruction::Nop;
-                        }
+                if let Instruction::Add(_) = code[i - 1] {
+                    if let Instruction::LoopBegin(_) = code[i - 2] {
+                        // Replace with NOP because removing elements from a vector is a O(n)
+                        // operation
+                        code[i - 2] = Instruction::ResetByte;
+                        code[i - 1] = Instruction::Nop;
+                        code[i - 0] = Instruction::Nop;
                     }
                 }
             }
