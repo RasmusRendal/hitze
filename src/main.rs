@@ -23,11 +23,11 @@ fn main() {
     let args = Args::parse();
     let code = fs::read_to_string(args.file).expect("Could not read file");
     let mut code = parse(&code);
-    optimize(&mut code);
     let mut memory: Vec<u8> = vec![0; u16::max_value() as usize + 1];
     if args.interpret {
         interpret(&code, memory.as_mut_slice(), args.trace);
     } else {
+        optimize(&mut code);
         let prog = compile(&code);
         prog.run(memory.as_mut_slice());
     }
