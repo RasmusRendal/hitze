@@ -41,5 +41,17 @@ fn test_code() {
     // Hello World (Golfed)
     assert_memory_equal("+[-->-[>>+>-----<<]<--<---]>->>>+>>+++[>]<<<<+++------<<->>>>+");
     assert_memory_equal("++>+++++<[->+<]");
-    assert_memory_equal(include_str!("../examples/long.bf"));
+}
+
+#[test]
+fn test_long() {
+    // This takes too long to run for the parser, so the result is hardcoded
+    let mut expected_vec = vec![0; u16::max_value() as usize+1];
+    expected_vec[1] = 202;
+    let mut memory = vec![0; u16::max_value() as usize+1];
+    let mut code = parse(include_str!("../examples/long.bf"));
+    optimize(&mut code);
+    let asm = compile(&code);
+    asm.run(memory.as_mut_slice());
+    assert_vecs_equal(&expected_vec, &memory);
 }
