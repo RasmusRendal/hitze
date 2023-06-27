@@ -2,14 +2,15 @@ use std::mem;
 
 const PAGE_SIZE: usize = 4096;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Program {
-    pub func: fn(bf_memory: *mut u8, len: usize) -> i64,
+    pub func: fn(bf_memory: *mut u8, len: usize, startpos: usize) -> usize,
 }
 
 impl Program {
-    pub fn run(&self, memory: &mut [u8]) -> i64 {
+    pub fn run(&self, memory: &mut [u8], pointer_start: usize) -> usize {
         let func = self.func;
-        func(memory.as_mut_ptr(), memory.len())
+        func(memory.as_mut_ptr(), memory.len(), pointer_start)
     }
 }
 

@@ -8,20 +8,20 @@ pub fn interpret(code: &Vec<Instruction>, memory: &mut [u8], trace: bool) {
             println!("Executing instruction {:?}", code[pc]);
             println!("pc: {}, mp: {}", pc, mp);
         }
-        match code[pc] {
+        match &code[pc] {
             Instruction::MovePointer(i) => {
-                if i < 0 {
-                    mp = mp.wrapping_sub(isize::abs(i) as u16);
+                if *i < 0 {
+                    mp = mp.wrapping_sub(isize::abs(*i) as u16);
                 } else {
-                    mp = mp.wrapping_add(i as u16);
+                    mp = mp.wrapping_add(*i as u16);
                 }
                 pc += 1;
             }
             Instruction::Add(i) => {
-                if i < 0 {
-                    memory[mp as usize] = memory[mp as usize].wrapping_sub(i8::abs(i) as u8);
+                if *i < 0 {
+                    memory[mp as usize] = memory[mp as usize].wrapping_sub(i8::abs(*i) as u8);
                 } else {
-                    memory[mp as usize] = memory[mp as usize].wrapping_add(i as u8);
+                    memory[mp as usize] = memory[mp as usize].wrapping_add(*i as u8);
                 }
                 pc += 1;
             }
@@ -30,7 +30,7 @@ pub fn interpret(code: &Vec<Instruction>, memory: &mut [u8], trace: bool) {
                 pc += 1;
             }
             Instruction::Output(i) => {
-                for _ in 0..i {
+                for _ in 0..*i {
                     let c: char = memory[mp as usize].into();
                     print!("{}", c);
                 }
@@ -41,20 +41,30 @@ pub fn interpret(code: &Vec<Instruction>, memory: &mut [u8], trace: bool) {
             }
             Instruction::LoopBegin(i) => {
                 if memory[mp as usize] == 0 {
-                    pc = i;
+                    pc = *i;
                 } else {
                     pc += 1;
                 }
             }
             Instruction::LoopEnd(i) => {
                 if memory[mp as usize] != 0 {
-                    pc = i;
+                    pc = *i;
                 } else {
                     pc += 1;
                 }
             }
-            _ => {
-                panic!("Unsupported instruction");
+            Instruction::Nop(i) => {
+                pc += i;
+            }
+            Instruction::AddRel(rel, mul) => {
+                let loc = ((mp as isize) + rel) as u16;
+                memory[loc as usize] =
+                    memory[loc as usize].wrapping_add(((memory[mp as usize] as i8) * mul) as u8);
+                pc += 1;
+            }
+            Instruction::Call(f) => {
+                mp = f.run(memory, mp as usize) as u16;
+                pc += 1;
             }
         }
     }

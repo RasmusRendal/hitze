@@ -1,3 +1,5 @@
+use super::compiler::assembler::Program;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Instruction {
     // When positive, represents >, when negative represents <
@@ -11,10 +13,11 @@ pub enum Instruction {
     // Not real brainfuck
     // Sets the current byte to zero
     ResetByte,
-    // Empty instruction
-    Nop,
+    // Jump ahead n instructions
+    Nop(usize),
     // Adds the current byte to the byte n spaces removed, multiplied by the second argument
     AddRel(isize, i8),
+    Call(Program),
 }
 
 fn append_current(output: &mut Vec<Instruction>, current: Option<Instruction>) {

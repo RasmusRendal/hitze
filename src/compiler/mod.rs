@@ -4,19 +4,29 @@ pub mod assembler;
 use assembler::*;
 
 /* General notes
- * Arguments: %rdi memory region start
- * %rsi memory region len
- * %rdx memory region end
- * We store the pointer in %rax
+ * Arguments:
+ *  - %rdi memory region start
+ *  - %rsi memory region len
+ *  - %rdx memory pointer initial pos
+ *
+ * When running:
+ *  - %rax memory pointer position
+ *  - %rdi memory region start
+ *  - %rsi memory region len
+ *  - %rdx memory region end
+ * Returns memory pointer position, relative to %rdi
  */
 
-pub fn compile(code: &Vec<Instruction>) -> Program {
+pub fn compile(code: &[Instruction]) -> Program {
     let mut assembler = allocate(code.len() * 10);
 
     assembler.push(RBP);
 
     assembler.mov_reg_reg(RBP, RSP);
+
     assembler.mov_reg_reg(RAX, RDI);
+    assembler.add_reg_reg(RAX, RDX);
+
     assembler.mov_reg_reg(RDX, RAX);
     assembler.add_reg_reg(RDX, RSI);
 
@@ -90,11 +100,15 @@ pub fn compile(code: &Vec<Instruction>) -> Program {
                 }
                 assembler.add_rax8disp_reg(offset as i8, RCX);
             }
-            Instruction::Nop => {}
+            Instruction::Nop(_) => {}
+            Instruction::Call(_) => {
+                panic!("Nested calls not supported");
+            }
         }
     }
     assembler.mov_reg_reg(RSP, RBP);
     assembler.pop(RBP);
+    assembler.sub_reg_reg(RAX, RDI);
     assembler.ret();
 
     assembler.create_program()
