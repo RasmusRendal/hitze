@@ -1,8 +1,7 @@
 use hitze::interpreter::interpret;
 use hitze::optimizer::optimize;
 use hitze::parser::parse;
-mod common;
-use common::assert_vecs_equal;
+use hitze::util::assert_arrays_equal;
 
 #[test]
 fn test_parser() {
@@ -12,6 +11,6 @@ fn test_parser() {
     let mut memory = vec![0; u16::max_value() as usize + 1];
     let mut code = parse("+++[->++[->+>+<<]<]");
     optimize(&mut code);
-    interpret(&code, memory.as_mut_slice(), false);
-    assert_vecs_equal(&expected_vec, &memory);
+    interpret(&code, memory.as_mut_slice(), 0, false);
+    assert_arrays_equal(&expected_vec, &memory);
 }

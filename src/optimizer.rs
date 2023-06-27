@@ -47,7 +47,7 @@ pub fn optimize(code: &mut [Instruction]) {
                                     if let Instruction::Add(m) = code[i - 4] {
                                         if let Instruction::LoopBegin(_) = code[i - 5] {
                                             if m < 0 {
-                                                code[i - 5] = Instruction::AddRel(k, l as i8);
+                                                code[i - 5] = Instruction::AddRel(k, l);
                                                 code[i - 4] = Instruction::ResetByte;
                                                 code[i - 3] = Instruction::Nop(4);
                                                 code[i - 2] = Instruction::Nop(3);

@@ -1,21 +1,33 @@
 //use criterion::{criterion_group, criterion_main, Criterion};
-use hitze::runner::run;
+use hitze::runner;
 use iai::{black_box, main};
 
 fn bench_long() {
-    run(black_box(include_str!("../examples/long.bf")));
+    runner::run(
+        black_box(include_str!("../examples/long.bf")),
+        runner::DEFAULT_COMPILE_DEPTH,
+    );
 }
 
 fn bench_hello_world() {
-    run(black_box(include_str!("../examples/hello_world.bf")));
+    runner::run(
+        black_box(include_str!("../examples/hello_world.bf")),
+        runner::DEFAULT_COMPILE_DEPTH,
+    );
 }
 
 fn bench_hello_world_golf() {
-    run(black_box(include_str!("../examples/hello_world_golf.bf")));
+    runner::run(
+        black_box(include_str!("../examples/hello_world_golf.bf")),
+        runner::DEFAULT_COMPILE_DEPTH,
+    );
 }
 
 fn bench_mandelbrot() {
-    run(black_box(include_str!("../examples/mandelbrot.bf")));
+    runner::run(
+        black_box(include_str!("../examples/mandelbrot.bf")),
+        runner::DEFAULT_COMPILE_DEPTH,
+    );
 }
 
 main!(

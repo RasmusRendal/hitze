@@ -5,6 +5,7 @@ pub mod interpreter;
 pub mod optimizer;
 pub mod parser;
 pub mod runner;
+pub mod util;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -21,5 +22,5 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let code = fs::read_to_string(args.file).expect("Could not read file");
-    runner::run(&code);
+    runner::run(&code, runner::DEFAULT_COMPILE_DEPTH);
 }

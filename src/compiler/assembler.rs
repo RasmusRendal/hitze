@@ -1,10 +1,12 @@
+use crate::parser::Instruction;
 use std::mem;
 
 const PAGE_SIZE: usize = 4096;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Program {
-    pub func: fn(bf_memory: *mut u8, len: usize, startpos: usize) -> usize,
+    func: fn(bf_memory: *mut u8, len: usize, startpos: usize) -> usize,
+    pub code: Vec<Instruction>,
 }
 
 impl Program {
@@ -101,10 +103,11 @@ impl Assembler {
         }
     }
 
-    pub fn create_program(self) -> Program {
+    pub fn create_program(self, instructions: Vec<Instruction>) -> Program {
         unsafe {
             Program {
                 func: mem::transmute(self.page),
+                code: instructions,
             }
         }
     }
@@ -235,8 +238,19 @@ impl Assembler {
         self.push_dword(rel32off as u32);
     }
 
+    pub fn jae(&mut self, rel32off: i32) {
+        self.push_byte(0x0F);
+        self.push_byte(0x83);
+        self.push_dword(rel32off as u32);
+    }
+
     pub fn jna(&mut self, rel8off: i8) {
         self.push_byte(0x76);
+        self.push_byte(rel8off as u8);
+    }
+
+    pub fn jnb(&mut self, rel8off: i8) {
+        self.push_byte(0x73);
         self.push_byte(rel8off as u8);
     }
 

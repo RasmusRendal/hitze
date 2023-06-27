@@ -10,10 +10,8 @@ use assembler::*;
  *  - %rdx memory pointer initial pos
  *
  * When running:
- *  - %rax memory pointer position
+ *  - %rax memory pointer position (relative)
  *  - %rdi memory region start
- *  - %rsi memory region len
- *  - %rdx memory region end
  * Returns memory pointer position, relative to %rdi
  */
 
@@ -24,11 +22,13 @@ pub fn compile(code: &[Instruction]) -> Program {
 
     assembler.mov_reg_reg(RBP, RSP);
 
-    assembler.mov_reg_reg(RAX, RDI);
-    assembler.add_reg_reg(RAX, RDX);
+    assembler.mov_reg_reg(RAX, RDX);
 
-    assembler.mov_reg_reg(RDX, RAX);
-    assembler.add_reg_reg(RDX, RSI);
+    // Argument for write syscall
+    // rdx is unused the rest of the time
+    assembler.mov_reg_imm64(RDX, 1);
+
+    // TODO: Remove push_bytes, replace with the assembly thing
 
     let mut leftloops: Vec<isize> = vec![];
 
@@ -36,41 +36,38 @@ pub fn compile(code: &[Instruction]) -> Program {
         match *instr {
             Instruction::MovePointer(i) => {
                 if i < 0 {
-                    assembler.sub_rax_imm32(isize::abs(i) as u32);
-                    assembler.cmp_reg_reg(RDI, RAX);
-                    assembler.jna(3);
-                    assembler.add_reg_reg(RAX, RSI);
+                    // SUB RAX, i
+                    assembler.push_bytes(&[0x66, 0x2D]);
+                    assembler.push_bytes(&(isize::abs(i) as u16).to_ne_bytes());
                 } else {
-                    assembler.add_rax_imm32(i as u32);
-                    assembler.cmp_reg_reg(RDX, RAX);
-                    assembler.jnbe(3);
-                    assembler.sub_reg_reg(RAX, RSI);
+                    // ADD RAX, i
+                    assembler.push_bytes(&[0x66, 0x05]);
+                    assembler.push_bytes(&(i as u16).to_ne_bytes());
                 }
             }
             Instruction::Add(i) => {
                 if i < 0 {
-                    assembler.sub_regmem8_imm8(RAX, i8::abs(i) as u8);
+                    // sub    BYTE PTR [rdi+rax*1],0xfa
+                    assembler.push_bytes(&[0x80, 0x2C, 0x07, i8::abs(i) as u8]);
                 } else {
-                    assembler.add_regmem8_imm8(RAX, i as u8);
+                    // add    BYTE PTR [rdi+rax*1],0xfa
+                    assembler.push_bytes(&[0x80, 0x04, 0x07, i as u8]);
                 }
             }
             Instruction::ResetByte => {
-                assembler.mov_mem8_imm8(RAX, 0);
+                // mov    BYTE PTR [rdi+rax*1],0x0
+                assembler.push_bytes(&[0xC6, 0x04, 0x07, 0x00]);
             }
             Instruction::Output(i) => {
                 assembler.push(RAX);
                 assembler.push(RDI);
-                assembler.push(RSI);
-                assembler.push(RDX);
                 assembler.mov_reg_reg(RSI, RAX);
+                assembler.add_reg_reg(RSI, RDI);
                 assembler.mov_reg_imm64(RDI, 1);
-                assembler.mov_reg_imm64(RDX, 1);
                 for _ in 0..i {
                     assembler.mov_reg_imm64(RAX, 1);
                     assembler.syscall();
                 }
-                assembler.pop(RDX);
-                assembler.pop(RSI);
                 assembler.pop(RDI);
                 assembler.pop(RAX);
             }
@@ -78,11 +75,13 @@ pub fn compile(code: &[Instruction]) -> Program {
                 panic!("Unsupported instruction");
             }
             Instruction::LoopBegin(_) => {
-                assembler.cmp_mem8_imm8(RAX, 0);
+                // cmp    BYTE PTR [rdi+rax*1],0x0
+                assembler.push_bytes(&[0x80, 0x3C, 0x07, 0x00]);
                 leftloops.push(assembler.jz(0));
             }
             Instruction::LoopEnd(_) => {
-                assembler.cmp_mem8_imm8(RAX, 0);
+                // cmp    BYTE PTR [rdi+rax*1],0x0
+                assembler.push_bytes(&[0x80, 0x3C, 0x07, 0x00]);
                 let leftpos = leftloops.pop().unwrap();
                 let relpos = leftpos - assembler.cur_index;
                 assembler.jne((relpos - 2) as i32);
@@ -94,11 +93,13 @@ pub fn compile(code: &[Instruction]) -> Program {
                 assembler.update_byte(leftpos + 3, frontposbytes[3]);
             }
             Instruction::AddRel(offset, mul) => {
-                assembler.mov_reg_mem8(RCX, RAX);
+                // mov    cl,BYTE PTR [rdi+rax*1]
+                assembler.push_bytes(&[0x8A, 0x0C, 0x07]);
                 if mul != 1 {
                     assembler.imul_reg_imm32(RCX, mul as u8);
                 }
-                assembler.add_rax8disp_reg(offset as i8, RCX);
+                // add    BYTE PTR [rdi+rax*1+0x4],cl
+                assembler.push_bytes(&[0x00, 0x4C, 0x07, offset as u8]);
             }
             Instruction::Nop(_) => {}
             Instruction::Call(_) => {
@@ -108,8 +109,7 @@ pub fn compile(code: &[Instruction]) -> Program {
     }
     assembler.mov_reg_reg(RSP, RBP);
     assembler.pop(RBP);
-    assembler.sub_reg_reg(RAX, RDI);
     assembler.ret();
 
-    assembler.create_program()
+    assembler.create_program(code.to_vec())
 }
