@@ -22,6 +22,10 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let code = fs::read_to_string(args.file).expect("Could not read file");
-    // TODO: Use the arguments again
-    runner::run(&code, runner::DEFAULT_COMPILE_DEPTH);
+    runner::run(
+        &code,
+        args.interpret,
+        args.no_optimization,
+        runner::DEFAULT_COMPILE_DEPTH,
+    );
 }

@@ -6,7 +6,7 @@ use hitze::runner;
 use hitze::util::assert_arrays_equal;
 
 fn compare_interpreter_run(code: &str, compile_depth: usize) {
-    let memory2 = runner::run(code, compile_depth);
+    let memory2 = runner::run(code, false, false, compile_depth);
     let mut memory1 = vec![0; u16::max_value() as usize + 1];
     interpret(&parse(code), memory1.as_mut_slice(), 0, false);
     assert_arrays_equal(&memory1, &memory2);
@@ -86,6 +86,8 @@ fn test_long() {
     expected_vec[1] = 202;
     let memory = runner::run(
         include_str!("../examples/long.bf"),
+        false,
+        false,
         runner::DEFAULT_COMPILE_DEPTH,
     );
     assert_arrays_equal(&expected_vec, &memory);
